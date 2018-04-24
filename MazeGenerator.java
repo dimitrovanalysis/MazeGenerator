@@ -105,6 +105,15 @@ class Vertex {
 			return surroundings[2];
 		}
 
+		public void reset()
+		{
+			colValue = 0;
+			previous = null;
+			shortestPath = 0; 
+			checkIfInWay = false;
+			keepTrackOfOrder = 0;
+		}
+
 	}//vertex ends here
 
 
@@ -180,18 +189,53 @@ public void DFS(Vertex s) {
 	}
 }
 
+public void BFS(Vertex s)
+{
+	int traverseO = 1;
+	LinkedList<Vertex> queue = new LinkedList<Vertex>();
+	Vertex u = s;
+	queue.addFirst(s);
+	int inc = 0;
+	while (!queue.isEmpty() && !u.equals(end))
+	{
+		u = queue.removeLast();
+		Vertex[] adjNodes = u.surroundings;
+		for (int i = 0; i < adjNodes.length; i++)
+		{
+			Vertex v = adjNodes[i];
+			int direction = u.getVertexStatus(v);
+			if ((u.walls[direction] == 0) && v != null && v.colValue == 0) { 
+				v.colValue = 1; 
+				if (v.keepTrackOfOrder == 0){  
+    				if (pathHistory[traverseO] == 0){ 
+    					v.keepTrackOfOrder = traverseO;
+    					pathHistory[traverseO] = 1;	
+    				} else {	
+    					traverseO++;
+    					v.keepTrackOfOrder = traverseO;
+    					pathHistory[traverseO] = 1; //set it to used 
+    				}
+    			}
+				v.shortestPath = u.shortestPath + 1;
+				v.previous = u;
+				queue.addFirst(v);
+			}
+		}
+		u.colValue = 2;
+	}
+}
+
 public void reset() {
 	for (int i = 0; i < Size; i++)
 	{
 		for (int j = 0; j < Size; j++) 
 		{
-			mazeElementList[i][j].colValue = 0;
-			mazeElementList[i][j].previous = null;
-			mazeElementList[i][j].shortestPath = 0; 
+			mazeElementList[i][j].reset();
 		}
 	}
-	start.walls[0] = 100;//north wall is entry
-	end.walls[2] = 100; //south wall is exit
+	pathHistory = new int[Size*Size]; 
+	start.walls[0] = 100;	//north wall is entry
+	end.walls[2] = 100; 	//south wall is exit
 }
 
 public void populateGraph() {
@@ -487,21 +531,35 @@ public String printSolutionGrid() {
 
 
 public static void main(String[] args) {
-	MazeGenerator g = new MazeGenerator(5);
-	g.generateMaze();
+	MazeGenerator g1 = new MazeGenerator(5);
+	g1.generateMaze();
 	System.out.println("Blank Generated Grid: ");
-	String maze = g.printInitialGrid();
-	System.out.println(maze);
-	g.DFS(g.mazeElementList[0][0]);
-	String aGrid = g.printBFSDFSGrid();
+	String maze1 = g1.printInitialGrid();
+	System.out.println(maze1);
+	g1.DFS(g1.mazeElementList[0][0]);
+	String aGrid1 = g1.printBFSDFSGrid();
 	System.out.println();
 	System.out.println("DFS Attempt");
-	System.out.println(aGrid);
-	g.setPath();
+	System.out.println(aGrid1);
+	g1.setPath();
 	System.out.println("Solution");
-	String dGrid = g.printSolutionGrid();
+	String dGrid1 = g1.printSolutionGrid();
 	System.out.println();
-	System.out.println(dGrid);
-
+	System.out.println(dGrid1);
+	
+	g1.reset();
+	System.out.println("Blank Generated Grid: ");
+	maze1 = g1.printInitialGrid();
+	System.out.println(maze1);
+	g1.BFS(g1.mazeElementList[0][0]);
+	aGrid1 = g1.printBFSDFSGrid();
+	System.out.println();
+	System.out.println("BFS Attempt");
+	System.out.println(aGrid1);
+	g1.setPath();
+	System.out.println("Solution");
+	dGrid1 = g1.printSolutionGrid();
+	System.out.println();
+	System.out.println(dGrid1);
 }
 }//MazeGenerator Ends here
