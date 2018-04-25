@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Checks if the MazeGenerator generates the same maze after it is run the second time.
- * @author Dale Christian Seen and Konstatin Dimitrov
+ * @author Dale Christian Seen and Konstantin Dimitrov
  *
  */
 class MazeGeneratorTest2 {
